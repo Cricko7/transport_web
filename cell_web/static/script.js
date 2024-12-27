@@ -14,8 +14,8 @@ document.getElementById('station-form').addEventListener('submit', function(even
     .then(response => response.json())
     .then(data => {
         console.log(data.message);
-        // Здесь можно добавить логику для отображения станции на карте
+        // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
         this.reset();
     })
-    .catch(error => console.error('Ошибка:', error));
+    .catch(error => console.error('Error:', error));
 });

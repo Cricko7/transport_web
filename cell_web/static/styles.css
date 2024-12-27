@@ -11,7 +11,7 @@ header {
 
 #map {
     height: 400px;
-    background-color: #eaeaea; /* Замените на вашу карту */
+    background-color: #eaeaea;
 }
 
 #controls {
