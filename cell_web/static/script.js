@@ -5,7 +5,11 @@ document.getElementById('station-form').addEventListener('submit', function(even
     const location = document.getElementById('location').value;
     const latitude = parseFloat(document.getElementById('latitude').value);
     const longitude = parseFloat(document.getElementById('longitude').value);
-
+// Валидация координат
+if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    alert("Пожалуйста, введите корректные координаты.");
+    return;
+}
     fetch('/add_station', {
         method: 'POST',
         headers: {

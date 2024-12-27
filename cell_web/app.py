@@ -38,6 +38,18 @@ def add_station():
     except Exception as e:
         return jsonify({"message": "Ошибка при добавлении станции", "error": str(e)}), 400
 
+@app.route('/delete_station/<int:id>', methods=['DELETE'])
+def delete_station(id):
+    try:
+        conn = sqlite3.connect('stations.db')
+        cursor = conn.cursor()
+        cursor.execute('DELETE FROM stations WHERE id = ?', (id,))
+        conn.commit()
+        conn.close()
+        return jsonify({"message": "Станция удалена"}), 200
+    except Exception as e:
+        return jsonify({"message": "Ошибка при удалении станции", "error": str(e)}), 400
+
 @app.route('/stations', methods=['GET'])
 def get_stations():
     conn = sqlite3.connect('stations.db')
