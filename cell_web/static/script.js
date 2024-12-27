@@ -4,15 +4,6 @@ document.getElementById('station-form').addEventListener('submit', function(even
     const frequency = document.getElementById('frequency').value;
     const location = document.getElementById('location').value;
 
-    .then(data => {
-        console.log(data.message);
-        const stationList = document.getElementById('station-list');
-        const newStation = document.createElement('li');
-        newStation.textContent = `Частота: ${frequency}, Расположение: ${location}`;
-        stationList.appendChild(newStation);
-        this.reset();
-    })
-    
     fetch('/add_station', {
         method: 'POST',
         headers: {
@@ -23,7 +14,14 @@ document.getElementById('station-form').addEventListener('submit', function(even
     .then(response => response.json())
     .then(data => {
         console.log(data.message);
-        this.reset();
+        
+        // Добавляем новую станцию в список на странице
+        const stationList = document.getElementById('station-list');
+        const newStation = document.createElement('li');
+        newStation.textContent = `Частота: ${frequency}, Расположение: ${location}`;
+        stationList.appendChild(newStation);
+        
+        this.reset(); // Сбрасываем форму
     })
     .catch(error => console.error('Error:', error));
 });
