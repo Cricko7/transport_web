@@ -44,29 +44,32 @@
       
       // Загрузка станций и добавление маркеров на карту
       fetch('/stations')
-      .then(response => response.json())
-      .then(stations => {
-        stations.forEach(station => {
-            const [frequency, location, latitude, longitude] = station;
-            L.marker([latitude, longitude]).addTo(map)
-            .bindPopup(`Частота: ${frequency}<br>Расположение: ${location}`);
-    
-    
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Удалить';
-        deleteButton.onclick = function() {
-            fetch(`/delete_station/${id}`, { method: 'DELETE' })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data.message);
-                    stationList.removeChild(newStation); // Удаляем элемент из списка
-                    map.removeLayer(marker); // Удаляем маркер с карты
-                });
-        };
-        newStation.appendChild(deleteButton);
-    });
-});
+          .then(response => response.json())
+          .then(stations => {
+              stations.forEach(station => {
+                  const [id, frequency, location, latitude, longitude] = station;
+                  const marker = L.marker([latitude, longitude]).addTo(map)
+                      .bindPopup(`Частота: ${frequency}<br>Расположение: ${location}`);
+                  
+                  // Добавляем кнопку удаления для каждой станции
+                  const deleteButton = document.createElement('button');
+                  deleteButton.textContent = 'Удалить';
+                  deleteButton.onclick = function() {
+                      fetch(`/delete_station/${id}`, { method: 'DELETE' })
+                          .then(response => response.json())
+                          .then(data => {
+                              console.log(data.message);
+                              map.removeLayer(marker); // Удаляем маркер с карты
+                              stationList.removeChild(newStation); // Удаляем элемент из списка
+                          });
+                  };
 
+                  const newStation = document.createElement('li');
+                  newStation.textContent = `Частота: ${frequency}, Расположение: ${location}`;
+                  newStation.appendChild(deleteButton);
+                  document.getElementById('station-list').appendChild(newStation);
+              });
+          });
     </script>
 
 </body>

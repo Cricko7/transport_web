@@ -38,6 +38,15 @@ def add_station():
     except Exception as e:
         return jsonify({"message": "Ошибка при добавлении станции", "error": str(e)}), 400
 
+@app.route('/stations', methods=['GET'])
+def get_stations():
+    conn = sqlite3.connect('stations.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, frequency, location, latitude, longitude FROM stations')
+    stations = cursor.fetchall()
+    conn.close()
+    return jsonify(stations)
+
 @app.route('/delete_station/<int:id>', methods=['DELETE'])
 def delete_station(id):
     try:
@@ -49,15 +58,6 @@ def delete_station(id):
         return jsonify({"message": "Станция удалена"}), 200
     except Exception as e:
         return jsonify({"message": "Ошибка при удалении станции", "error": str(e)}), 400
-
-@app.route('/stations', methods=['GET'])
-def get_stations():
-    conn = sqlite3.connect('stations.db')
-    cursor = conn.cursor()
-    cursor.execute('SELECT frequency, location, latitude, longitude FROM stations')
-    stations = cursor.fetchall()
-    conn.close()
-    return jsonify(stations)
 
 if __name__ == '__main__':
     init_db()  # Инициализация базы данных при запуске приложения

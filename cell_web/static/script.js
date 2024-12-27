@@ -5,11 +5,13 @@ document.getElementById('station-form').addEventListener('submit', function(even
     const location = document.getElementById('location').value;
     const latitude = parseFloat(document.getElementById('latitude').value);
     const longitude = parseFloat(document.getElementById('longitude').value);
-// Валидация координат
-if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-    alert("Пожалуйста, введите корректные координаты.");
-    return;
-}
+
+    // Валидация координат
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        alert("Пожалуйста, введите корректные координаты.");
+        return;
+    }
+
     fetch('/add_station', {
         method: 'POST',
         headers: {
@@ -25,11 +27,26 @@ if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
         const stationList = document.getElementById('station-list');
         const newStation = document.createElement('li');
         newStation.textContent = `Частота: ${frequency}, Расположение: ${location}`;
-        stationList.appendChild(newStation);
         
         // Добавляем маркер на карту
-        L.marker([latitude, longitude]).addTo(map)
+        const marker = L.marker([latitude, longitude]).addTo(map)
             .bindPopup(`Частота: ${frequency}<br>Расположение: ${location}`);
+        
+        // Добавляем кнопку удаления для новой станции
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Удалить';
+        deleteButton.onclick = function() {
+            fetch(`/delete_station/${data.id}`, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message);
+                    map.removeLayer(marker); // Удаляем маркер с карты
+                    stationList.removeChild(newStation); // Удаляем элемент из списка
+                });
+        };
+        
+        newStation.appendChild(deleteButton);
+        stationList.appendChild(newStation);
         
         this.reset(); // Сбрасываем форму
     })
