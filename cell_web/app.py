@@ -1,4 +1,3 @@
-import os
 import sqlite3
 from flask import Flask, jsonify, request, render_template
 
@@ -12,18 +11,18 @@ def init_db():
         CREATE TABLE IF NOT EXISTS stations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             frequency TEXT NOT NULL,
-            location TEXT NOT NULL
+            location TEXT NOT NULL,
+            latitude REAL NOT NULL,
+            longitude REAL NOT NULL
         )
     ''')
     conn.commit()
     conn.close()
 
-# Обработка маршрута главной страницы
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# Обработка добавления станции
 @app.route('/add_station', methods=['POST'])
 def add_station():
     data = request.get_json()
@@ -31,13 +30,22 @@ def add_station():
         # Сохранение станции в базу данных
         conn = sqlite3.connect('stations.db')
         cursor = conn.cursor()
-        cursor.execute('INSERT INTO stations (frequency, location) VALUES (?, ?)', 
-                       (data['frequency'], data['location']))
+        cursor.execute('INSERT INTO stations (frequency, location, latitude, longitude) VALUES (?, ?, ?, ?)', 
+                       (data['frequency'], data['location'], data['latitude'], data['longitude']))
         conn.commit()
         conn.close()
         return jsonify({"message": "Станция добавлена"}), 201
     except Exception as e:
         return jsonify({"message": "Ошибка при добавлении станции", "error": str(e)}), 400
+
+@app.route('/stations', methods=['GET'])
+def get_stations():
+    conn = sqlite3.connect('stations.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT frequency, location, latitude, longitude FROM stations')
+    stations = cursor.fetchall()
+    conn.close()
+    return jsonify(stations)
 
 if __name__ == '__main__':
     init_db()  # Инициализация базы данных при запуске приложения

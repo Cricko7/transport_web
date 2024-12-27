@@ -1,19 +1,19 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Times New Roman', Times, serif;
 }
 
 header {
-    background-color: #4CAF50;
-    color: white;
+    background-color: #e5c122;
+    color: rgb(0, 0, 0);
     padding: 10px 0;
     text-align: center;
 }
 
 #map {
     height: 400px;
-    background-color: #eaeaea;
 }
 
 #controls {
     margin-top: 20px;
 }
+

@@ -3,13 +3,15 @@ document.getElementById('station-form').addEventListener('submit', function(even
     
     const frequency = document.getElementById('frequency').value;
     const location = document.getElementById('location').value;
+    const latitude = parseFloat(document.getElementById('latitude').value);
+    const longitude = parseFloat(document.getElementById('longitude').value);
 
     fetch('/add_station', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ frequency, location })
+        body: JSON.stringify({ frequency, location, latitude, longitude })
     })
     .then(response => response.json())
     .then(data => {
@@ -20,6 +22,10 @@ document.getElementById('station-form').addEventListener('submit', function(even
         const newStation = document.createElement('li');
         newStation.textContent = `Частота: ${frequency}, Расположение: ${location}`;
         stationList.appendChild(newStation);
+        
+        // Добавляем маркер на карту
+        L.marker([latitude, longitude]).addTo(map)
+            .bindPopup(`Частота: ${frequency}<br>Расположение: ${location}`);
         
         this.reset(); // Сбрасываем форму
     })
