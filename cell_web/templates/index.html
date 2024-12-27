@@ -28,8 +28,25 @@
                 <input type="number" id="longitude" step="any" required>
                 <button type="submit">Добавить станцию</button>
             </form>
+
             <h2>Список станций</h2>
             <ul id="station-list"></ul>
+
+            <!-- Форма для редактирования станции -->
+            <h2>Редактировать станцию</h2>
+            <form id="edit-station-form" style="display:none;">
+                <input type="hidden" id="edit-station-id">
+                <label for="edit-frequency">Частота:</label>
+                <input type="text" id="edit-frequency" required>
+                <label for="edit-location">Расположение:</label>
+                <input type="text" id="edit-location" required>
+                <label for="edit-latitude">Широта:</label>
+                <input type="number" id="edit-latitude" step="any" required>
+                <label for="edit-longitude">Долгота:</label>
+                <input type="number" id="edit-longitude" step="any" required>
+                <button type="submit">Сохранить изменения</button>
+            </form>
+
         </div>
     </main>
 
@@ -50,7 +67,7 @@
                   const [id, frequency, location, latitude, longitude] = station;
                   const marker = L.marker([latitude, longitude]).addTo(map)
                       .bindPopup(`Частота: ${frequency}<br>Расположение: ${location}`);
-                  
+
                   // Добавляем кнопку удаления для каждой станции
                   const deleteButton = document.createElement('button');
                   deleteButton.textContent = 'Удалить';
@@ -64,12 +81,136 @@
                           });
                   };
 
+                  const editButton = document.createElement('button');
+                  editButton.textContent = 'Редактировать';
+                  editButton.onclick = function() {
+                      document.getElementById('edit-station-id').value = id;
+                      document.getElementById('edit-frequency').value = frequency;
+                      document.getElementById('edit-location').value = location;
+                      document.getElementById('edit-latitude').value = latitude;
+                      document.getElementById('edit-longitude').value = longitude;
+                      document.getElementById('edit-station-form').style.display = 'block';
+                  };
+
                   const newStation = document.createElement('li');
                   newStation.textContent = `Частота: ${frequency}, Расположение: ${location}`;
+                  newStation.appendChild(editButton);
                   newStation.appendChild(deleteButton);
                   document.getElementById('station-list').appendChild(newStation);
               });
           });
+
+      // Обработка редактирования станции
+      document.getElementById('edit-station-form').addEventListener('submit', function(event) {
+          event.preventDefault();
+          
+          const id = document.getElementById('edit-station-id').value;
+          const frequency = document.getElementById('edit-frequency').value;
+          const location = document.getElementById('edit-location').value;
+          const latitude = parseFloat(document.getElementById('edit-latitude').value);
+          const longitude = parseFloat(document.getElementById('edit-longitude').value);
+
+          fetch(`/edit_station/${id}`, {
+              method: 'PUT',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ frequency, location, latitude, longitude })
+          })
+          .then(response => response.json())
+          .then(data => {
+              console.log(data.message);
+              // Обновляем маркер на карте
+              map.eachLayer(function(layer) {
+                  if (layer instanceof L.Marker && layer.getPopup().getContent().includes(frequency)) {
+                      layer.setLatLng([latitude, longitude]).bindPopup(`Частота: ${frequency}<br>Расположение: ${location}`);
+                  }
+              });
+              
+              // Обновляем элемент списка
+              const stationListItems = document.querySelectorAll('#station-list li');
+              stationListItems.forEach(item => {
+                  if (item.textContent.includes(frequency)) {
+                      item.textContent = `Частота: ${frequency}, Расположение: ${location}`;
+                      item.appendChild(editButton);
+                      item.appendChild(deleteButton);
+                  }
+              });
+
+              this.reset(); // Сбрасываем форму редактирования
+              document.getElementById('edit-station-form').style.display = 'none'; // Скрываем форму редактирования
+          })
+          .catch(error => console.error('Error:', error));
+      });
+      
+      // Обработка добавления новой станции
+      document.getElementById('station-form').addEventListener('submit', function(event) {
+          event.preventDefault();
+          
+          const frequency = document.getElementById('frequency').value;
+          const location = document.getElementById('location').value;
+          const latitude = parseFloat(document.getElementById('latitude').value);
+          const longitude = parseFloat(document.getElementById('longitude').value);
+
+          // Валидация координат
+          if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+              alert("Пожалуйста, введите корректные координаты.");
+              return;
+          }
+
+          fetch('/add_station', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ frequency, location, latitude, longitude })
+          })
+          .then(response => response.json())
+          .then(data => {
+              console.log(data.message);
+              
+              // Добавляем новую станцию в список на странице
+              const stationList = document.getElementById('station-list');
+              const newStationItem = document.createElement('li');
+              newStationItem.textContent = `Частота: ${frequency}, Расположение: ${location}`;
+              
+              // Добавляем маркер на карту
+              const marker = L.marker([latitude, longitude]).addTo(map)
+                  .bindPopup(`Частота: ${frequency}<br>Расположение: ${location}`);
+              
+              // Добавляем кнопку удаления для новой станции
+              const deleteButtonNew = document.createElement('button');
+              deleteButtonNew.textContent = 'Удалить';
+              deleteButtonNew.onclick = function() {
+                  fetch(`/delete_station/${data.id}`, { method: 'DELETE' })
+                      .then(response => response.json())
+                      .then(data => {
+                          console.log(data.message);
+                          map.removeLayer(marker); // Удаляем маркер с карты
+                          stationList.removeChild(newStationItem); // Удаляем элемент из списка
+                      });
+              };
+              
+              const editButtonNew = document.createElement('button');
+              editButtonNew.textContent = 'Редактировать';
+              editButtonNew.onclick = function() {
+                  document.getElementById('edit-station-id').value = data.id;
+                  document.getElementById('edit-frequency').value = frequency;
+                  document.getElementById('edit-location').value = location;
+                  document.getElementById('edit-latitude').value = latitude;
+                  document.getElementById('edit-longitude').value = longitude;
+                  document.getElementById('edit-station-form').style.display = 'block';
+              };
+
+              newStationItem.appendChild(editButtonNew);
+              newStationItem.appendChild(deleteButtonNew);
+              stationList.appendChild(newStationItem);
+              
+              this.reset(); // Сбрасываем форму
+          })
+          .catch(error => console.error('Error:', error));
+      });
+      
     </script>
 
 </body>
