@@ -14,7 +14,6 @@ document.getElementById('station-form').addEventListener('submit', function(even
     .then(response => response.json())
     .then(data => {
         console.log(data.message);
-        // ����� ����� �������� ������ ��� ����������� ������� �� �����
         this.reset();
     })
     .catch(error => console.error('Error:', error));
