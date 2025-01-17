@@ -1,0 +1,22 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+}
+
+#map {
+    height: 400px;
+}
+
+#controls {
+    margin-top: 20px;
+}
+
+button {
+    margin-left: 5px; /* Отступ_между_кнопками */
+}
