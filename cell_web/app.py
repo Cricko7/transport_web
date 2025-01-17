@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
-# Инициализация базы данных
+# Инициализация БД
 def init_db():
     conn = sqlite3.connect('stations.db')
     cursor = conn.cursor()

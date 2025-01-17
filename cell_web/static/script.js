@@ -48,7 +48,7 @@ document.getElementById('station-form').addEventListener('submit', function(even
         newStation.appendChild(deleteButton);
         stationList.appendChild(newStation);
         
-        this.reset(); // Сбрасываем форму
+        this.reset(); // Сбрасываем_форму
     })
     .catch(error => console.error('Error:', error));
 });
