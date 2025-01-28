@@ -1,0 +1,6 @@
+version: '1'
+services:
+  web:
+    image: myapp-image
+    ports:
+      - "80:80"
