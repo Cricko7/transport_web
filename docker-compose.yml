@@ -5,4 +5,4 @@ services:
     ports:
       - "80:80"
     volumes:
-      - .\cell_web\templates\index.html
+      - ./project:/cell_web/templates/index
